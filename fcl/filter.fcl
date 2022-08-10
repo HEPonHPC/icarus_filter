@@ -1,0 +1,14 @@
+process_name : filter
+
+physics : {
+  filters : {
+    productsizefilter : {
+      module_type : ProductSizeFilter
+      maxSizePhotons : 500000000
+      maxSizeChannels :  500000000
+      maxSizeParticles : 500000000
+   }
+ }
+
+  fp: [productsizefilter] # Tells art to run the 'productsizefilter' as part of the 'fp' trigger path
+} 

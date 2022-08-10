@@ -1,0 +1,11 @@
+#include "intime_g4_icarus_sce_overburden_lite.fcl"
+
+physics.filters.productsizefilter : {
+      module_type : ProductSizeFilter
+      maxSizePhotons : 500000000
+      maxSizeChannels :  500000000
+      maxSizeParticles : 500000000
+   }
+
+physics.merge: [rns, larg4outtime, largeant, productsizefilter, ionization]
+outputs.out1.SelectEvents: [merge]
