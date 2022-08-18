@@ -26,6 +26,9 @@ Another underscore separates the module name and the instance name, which in thi
 example is the empty string – there are two underscores together there.
 The last string is the process name and usually is not needed to be specified
 in data product retrieval.
+
+SS: simb::MCParticles size is still not what we are checking against. 
+Will deal with it later if needed. 
 */
 // ======================================================================
 
@@ -52,6 +55,45 @@ using art::ProductSizeFilter;
 
 // ======================================================================
 
+size_t size_in_bytes(std::vector<sim::OnePhoton> const& v) {
+  return v.size()*sizeof(sim::IDE) + sizeof(v);
+}
+
+size_t size_in_bytes(sim::SimPhotons const& t) {
+  return sizeof(int) + size_in_bytes(static_cast<std::vector<sim::OnePhoton>const& >(t));
+} 
+size_t size_in_bytes(std::vector<sim::SimPhotons> const& v) {
+  size_t res = 0;
+  for (auto const& x : v) res += size_in_bytes(x);
+  return res + sizeof(v);
+}
+
+size_t size_in_bytes(std::vector<sim::IDE> const& v) {
+  return (v.size()*sizeof(sim::IDE))+ sizeof(v);
+}
+
+size_t size_in_bytes(sim::TDCIDE const& t) {
+  return sizeof(t.first) + size_in_bytes(t.second);
+}
+
+size_t size_in_bytes(std::vector<sim::TDCIDE> const& v) {
+  size_t res = 0;
+  for (auto const& x : v) res += size_in_bytes(x);
+  return res + sizeof(v);
+}
+
+size_t size_in_bytes(sim::SimChannel const& s) {
+  return sizeof(unsigned int) + size_in_bytes(s.TDCIDEMap());
+}
+
+size_t size_in_bytes(std::vector<sim::SimChannel> const& v) {
+  size_t res = 0;
+  for (auto const& x : v) res += size_in_bytes(x);
+  return res + sizeof(v);
+}
+/// 
+//
+//
 class art::ProductSizeFilter : public SharedFilter {
   public:
     struct Config {
@@ -92,15 +134,31 @@ art::ProductSizeFilter::filter(art::Event& e, ProcessingFrame const& )
   art::Handle<std::vector<simb::MCParticle>> h_particles;
 
   // no instance label
-  if (e.getByLabel("largeant", "", h_photons) and h_photons->size() > max_size_Photons_) {
+  if (e.getByLabel("largeant", "", h_photons)) {
+    size_t photons_size = size_in_bytes(*h_photons);
+    for (auto i=0; i< h_photons->size(); ++i) {
+      photons_size+=((*h_photons)[i].size()*sizeof(sim::OnePhoton));
+    }
+    if (photons_size > max_size_Photons_) {
+    std::cout << "Event:" << e.id() << ", Photons size: " << photons_size << std::endl;
     return false;
+    }
   }
-  if (e.getByLabel("largeant", "", h_channels) and h_channels->size() > max_size_Channels_) {
+  
+  if (e.getByLabel("largeant", "", h_channels)) {
+    size_t channels_size = size_in_bytes(*h_channels); 
+    if (channels_size > max_size_Channels_) {
+    std::cout << "Event: " << e.id() << ", channels size: " << channels_size << std::endl;
     return false;
+    }
   }
+
   if (e.getByLabel("largeant", "", h_particles) and h_particles->size() > max_size_Particles_) {
+    std::cout << "Event: " << e.id() << std::endl; 
     return false;
   }
+
+  std::cout << e.id() << ", particles size: " << h_particles->size() << std::endl;
 
   return true;
 
