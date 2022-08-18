@@ -4,7 +4,7 @@ physics.filters.productsizefilter : {
       module_type : ProductSizeFilter
       maxSizePhotons : 500000000
       maxSizeChannels :  500000000
-      maxSizeParticles : 500000000
+      maxNumParticles : 10000
    }
 
 physics.merge: [rns, larg4outtime, largeant, productsizefilter, ionization]

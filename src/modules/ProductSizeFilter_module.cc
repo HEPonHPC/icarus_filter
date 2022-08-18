@@ -99,7 +99,7 @@ class art::ProductSizeFilter : public SharedFilter {
     struct Config {
       Atom<size_t> maxSizePhotons{Name("maxSizePhotons"),500000000};
       Atom<size_t> maxSizeChannels{Name("maxSizeChannels"),500000000};
-      Atom<size_t> maxSizeParticles{Name("maxSizeParticles"),500000000};
+      Atom<size_t> maxNumParticles{Name("maxNumParticles"),10000};
     };
 
     using Parameters = Table<Config>;
@@ -110,7 +110,7 @@ class art::ProductSizeFilter : public SharedFilter {
 
     size_t max_size_Photons_;
     size_t max_size_Channels_;
-    size_t max_size_Particles_;
+    size_t max_num_Particles_;
 
 }; // ProductSizeFilter
 
@@ -120,7 +120,7 @@ ProductSizeFilter::ProductSizeFilter(Parameters const& config, ProcessingFrame c
   : SharedFilter{config}
   , max_size_Photons_{config().maxSizePhotons()}
   , max_size_Channels_{config().maxSizeChannels()}
-  , max_size_Particles_{config().maxSizeParticles()}
+  , max_num_Particles_{config().maxNumParticles()}
 {
   async<InEvent>();
 }
@@ -139,26 +139,26 @@ art::ProductSizeFilter::filter(art::Event& e, ProcessingFrame const& )
     for (auto i=0; i< h_photons->size(); ++i) {
       photons_size+=((*h_photons)[i].size()*sizeof(sim::OnePhoton));
     }
-    if (photons_size > max_size_Photons_) {
     std::cout << "Event:" << e.id() << ", Photons size: " << photons_size << std::endl;
+    if (photons_size > max_size_Photons_) {
     return false;
     }
   }
   
   if (e.getByLabel("largeant", "", h_channels)) {
     size_t channels_size = size_in_bytes(*h_channels); 
-    if (channels_size > max_size_Channels_) {
     std::cout << "Event: " << e.id() << ", channels size: " << channels_size << std::endl;
+    if (channels_size > max_size_Channels_) {
     return false;
     }
   }
 
-  if (e.getByLabel("largeant", "", h_particles) and h_particles->size() > max_size_Particles_) {
-    std::cout << "Event: " << e.id() << std::endl; 
-    return false;
+  if (e.getByLabel("largeant", "", h_particles)) {
+    std::cout << "Event: " << e.id() << ", Number of MC particles: " << h_particles->size() << std::endl; 
+    if ( h_particles->size() > max_num_Particles_) {
+      return false;
+    }
   }
-
-  std::cout << e.id() << ", particles size: " << h_particles->size() << std::endl;
 
   return true;
 
