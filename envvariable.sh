@@ -38,4 +38,6 @@ export LARDATAOBJ_LIB=${LARDATAOBJ_DIR}/lib
 export LARCOREOBJ_LIB=${LARCOREOBJ_DIR}/lib
 export THALLIUM_LIB=${THALLIUM_DIR}/lib
 
-
+export FW_SEARCH_PATH=/projects/HEP_on_HPC/icaruscode/spack/opt/spack/cray-cnl7-haswell/gcc-9.3.0/icarusalg-09.37.02.01-y33diartzlxslc7phvlio2ugg4vye3ui/gdml/:${FW_SEARCH_PATH}
+export FHICL_FILE_PATH=${ICARUSFILTER_SRC}/fcl:${FHICL_FILE_PATH} 
+export CET_PLUGIN_PATH=${ICARUSFILTER_BUILD}/src/modules:${CET_PLUGIN_PATH}
