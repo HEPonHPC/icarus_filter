@@ -2,8 +2,8 @@
 # 122289819
 physics.filters.productsizefilter : {
       module_type : ProductSizeFilter
-      maxSizePhotons : 500000000
-      maxSizeChannels :  500000000
+      maxSizePhotons : 200000000
+      maxSizeChannels :  200000000
       maxNumParticles : 10000
    }
 
