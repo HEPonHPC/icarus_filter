@@ -139,23 +139,23 @@ art::ProductSizeFilter::filter(art::Event& e, ProcessingFrame const& )
     for (auto i=0; i< h_photons->size(); ++i) {
       photons_size+=((*h_photons)[i].size()*sizeof(sim::OnePhoton));
     }
-    std::cout << "Event:" << e.id() << ", Photons size: " << photons_size << std::endl;
     if (photons_size > max_size_Photons_) {
-    return false;
+      std::cout << "Failed Event:" << e.id() << ", Photons size: " << photons_size << std::endl;
+      return false;
     }
   }
   
   if (e.getByLabel("largeant", "", h_channels)) {
     size_t channels_size = size_in_bytes(*h_channels); 
-    std::cout << "Event: " << e.id() << ", channels size: " << channels_size << std::endl;
     if (channels_size > max_size_Channels_) {
-    return false;
+      std::cout << "Failed Event: " << e.id() << ", channels size: " << channels_size << std::endl;
+      return false;
     }
   }
 
   if (e.getByLabel("largeant", "", h_particles)) {
-    std::cout << "Event: " << e.id() << ", Number of MC particles: " << h_particles->size() << std::endl; 
     if ( h_particles->size() > max_num_Particles_) {
+      std::cout << "Failed Event: " << e.id() << ", Number of MC particles: " << h_particles->size() << std::endl; 
       return false;
     }
   }
